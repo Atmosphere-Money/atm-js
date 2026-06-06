@@ -1,0 +1,72 @@
+name: Docs and SDK
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  app-node-sdk:
+    name: App Node SDK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - run: npm install --prefix packages/app-node
+      - run: npm run check --prefix packages/app-node
+
+  testing-sdk:
+    name: Testing SDK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - run: npm install --prefix packages/testing
+      - run: npm run check --prefix packages/testing
+
+  readme-snippets:
+    name: README snippets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - run: npm install --prefix packages/app-node
+      - run: npm install --prefix packages/testing
+      - run: npm run docs:snippets:check
+
+  node-example:
+    name: Starter apps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - run: npm run starters:check
+
+  public-sdk-install:
+    name: Public SDK install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - run: npm run sdk:public-install:check
+
+  sdk-tarballs:
+    name: SDK tarballs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - run: npm run sdk:pack:check

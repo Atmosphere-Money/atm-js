@@ -1,0 +1,48 @@
+name: Publish Testing SDK
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "npm dist-tag to publish"
+        required: true
+        default: "beta"
+        type: choice
+        options:
+          - beta
+          - latest
+      dry_run:
+        description: "Run npm publish in dry-run mode"
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Publish @atmosphere-money/testing
+    runs-on: ubuntu-latest
+    environment: npm
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+      - name: Use npm 11 for trusted publishing
+        run: npm install -g npm@11.16.0
+      - name: Confirm npm version
+        run: npm --version
+      - run: npm install --prefix packages/testing
+      - run: npm run publish:check --prefix packages/testing
+      - name: Publish dry run
+        if: ${{ inputs.dry_run }}
+        run: npm publish --dry-run --access public --tag "${{ inputs.tag }}"
+        working-directory: packages/testing
+      - name: Publish
+        if: ${{ !inputs.dry_run }}
+        run: npm publish --access public --provenance --tag "${{ inputs.tag }}"
+        working-directory: packages/testing

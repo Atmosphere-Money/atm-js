@@ -1,0 +1,22 @@
+{
+  "name": "atm-js",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Public JavaScript and TypeScript SDK packages for Atmosphere Money app integrations.",
+  "workspaces": [
+    "packages/app-node",
+    "packages/testing",
+    "examples/atm-node-app"
+  ],
+  "scripts": {
+    "sdk:app-node:check": "npm run check --prefix packages/app-node",
+    "sdk:testing:check": "npm run check --prefix packages/testing",
+    "docs:snippets:check": "node scripts/check-readme-snippets.mjs",
+    "sdk:pack:check": "node scripts/check-sdk-packages.mjs",
+    "sdk:check": "npm run sdk:app-node:check && npm run sdk:testing:check && npm run docs:snippets:check && npm run sdk:pack:check",
+    "sdk:public-install:check": "node scripts/check-public-sdk-install.mjs",
+    "starters:check": "node scripts/check-starter-apps.mjs"
+  }
+}

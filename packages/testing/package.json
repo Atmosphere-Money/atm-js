@@ -1,0 +1,64 @@
+{
+  "name": "@atmosphere-money/testing",
+  "version": "0.0.0-beta.2",
+  "description": "Testing fixtures and assertions for Atmosphere Money app integrations.",
+  "license": "MIT",
+  "type": "module",
+  "private": false,
+  "sideEffects": false,
+  "homepage": "https://atmosphere.money/docs/testing-package",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Atmosphere-Money/atm-js.git",
+    "directory": "packages/testing"
+  },
+  "bugs": {
+    "url": "https://github.com/Atmosphere-Money/atm-js/issues"
+  },
+  "keywords": [
+    "atmosphere-money",
+    "at-protocol",
+    "atproto",
+    "payments",
+    "webhooks",
+    "fixtures",
+    "testing"
+  ],
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "tsx test/index.test.ts",
+    "api:snapshot": "node ../../scripts/check-sdk-api-snapshot.mjs packages/testing --write",
+    "api:check": "node ../../scripts/check-sdk-api-snapshot.mjs packages/testing",
+    "check": "npm run build && npm run api:check && npm run test && npm run release:check && npm run pack:dry-run",
+    "release:check": "node scripts/check-release.mjs",
+    "publish:check": "ATM_TESTING_PUBLISH=1 node scripts/check-release.mjs && npm run pack:dry-run",
+    "pack:dry-run": "npm pack --dry-run",
+    "prepare": "npm run build",
+    "prepack": "npm run build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.22.3",
+    "typescript": "^5.7.2"
+  }
+}

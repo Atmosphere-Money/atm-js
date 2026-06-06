@@ -1,0 +1,136 @@
+{
+  "packageName": "@atmosphere-money/testing",
+  "version": "0.0.0-beta.2",
+  "generatedFrom": "packages/testing/src/index.ts",
+  "exports": [
+    {
+      "kind": "function",
+      "name": "assertFreshDelivery"
+    },
+    {
+      "kind": "const",
+      "name": "ATM_TEST_API_VERSION"
+    },
+    {
+      "kind": "const",
+      "name": "ATM_TEST_CREATED"
+    },
+    {
+      "kind": "const",
+      "name": "ATM_TEST_WEBHOOK_SECRET"
+    },
+    {
+      "kind": "type",
+      "name": "AtmFixtureOptions"
+    },
+    {
+      "kind": "type",
+      "name": "AtmFixtureRequestOptions"
+    },
+    {
+      "kind": "type",
+      "name": "AtmPaymentCompletedFixtureData"
+    },
+    {
+      "kind": "type",
+      "name": "AtmPaymentDisputedFixtureData"
+    },
+    {
+      "kind": "type",
+      "name": "AtmPaymentFailedFixtureData"
+    },
+    {
+      "kind": "type",
+      "name": "AtmPaymentRefundedFixtureData"
+    },
+    {
+      "kind": "type",
+      "name": "AtmProductArchivedFixtureData"
+    },
+    {
+      "kind": "type",
+      "name": "AtmReplayStore"
+    },
+    {
+      "kind": "type",
+      "name": "AtmSignedFixture"
+    },
+    {
+      "kind": "type",
+      "name": "AtmSubscriptionUpdatedFixtureData"
+    },
+    {
+      "kind": "type",
+      "name": "AtmTestEnvironment"
+    },
+    {
+      "kind": "type",
+      "name": "AtmTestWebhookEnvelope"
+    },
+    {
+      "kind": "type",
+      "name": "AtmTestWebhookEventType"
+    },
+    {
+      "kind": "type",
+      "name": "AtmTicketCheckedInFixtureData"
+    },
+    {
+      "kind": "type",
+      "name": "AtmTicketsIssuedFixtureData"
+    },
+    {
+      "kind": "function",
+      "name": "createAtmEventFixture"
+    },
+    {
+      "kind": "function",
+      "name": "createAtmIdempotencyKey"
+    },
+    {
+      "kind": "function",
+      "name": "createAtmWebhookRequest"
+    },
+    {
+      "kind": "function",
+      "name": "createMemoryReplayStore"
+    },
+    {
+      "kind": "function",
+      "name": "createPaymentCompletedFixture"
+    },
+    {
+      "kind": "function",
+      "name": "createPaymentDisputedFixture"
+    },
+    {
+      "kind": "function",
+      "name": "createPaymentFailedFixture"
+    },
+    {
+      "kind": "function",
+      "name": "createPaymentRefundedFixture"
+    },
+    {
+      "kind": "function",
+      "name": "createProductArchivedFixture"
+    },
+    {
+      "kind": "function",
+      "name": "createSubscriptionUpdatedFixture"
+    },
+    {
+      "kind": "function",
+      "name": "createTicketCheckedInFixture"
+    },
+    {
+      "kind": "function",
+      "name": "createTicketsIssuedFixture"
+    },
+    {
+      "kind": "function",
+      "name": "signAtmFixture"
+    }
+  ],
+  "clientMethods": []
+}
