@@ -41,6 +41,14 @@ provenance. Provenance is supported here because this SDK repo is public.
 5. Trigger the appropriate publish workflow with `dry_run=true`.
 6. Trigger the publish workflow with `dry_run=false`.
 7. Verify npm dist-tags and run `npm run sdk:public-install:check`.
+8. Review the package pages on npmx:
+   - `https://npmx.dev/package/@atmosphere-money/app-node`
+   - `https://npmx.dev/package/@atmosphere-money/testing`
+
+Use npmx as a package-health review surface for README, changelog, source,
+license, repository links, OSV vulnerability warnings, install/package size,
+and npm provenance indicators. Do not treat npmx as a second registry or a CI
+dependency; npm remains canonical.
 
 Keep `beta` as the recommended install tag until the SDKs are ready for stable
 app developers.

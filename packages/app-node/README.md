@@ -26,6 +26,12 @@ Atmosphere Money code.
 npm install @atmosphere-money/app-node@beta
 ```
 
+Package browser:
+[`@atmosphere-money/app-node` on npmx](https://npmx.dev/package/@atmosphere-money/app-node)
+
+npm remains the canonical install source. Use npmx for README, source,
+changelog, provenance, vulnerability, package-size, and registry health review.
+
 ## Initialize
 
 ```ts

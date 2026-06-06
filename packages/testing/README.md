@@ -18,6 +18,12 @@ integrations. The current beta is published on npm for invited app developers.
 npm install -D @atmosphere-money/testing@beta
 ```
 
+Package browser:
+[`@atmosphere-money/testing` on npmx](https://npmx.dev/package/@atmosphere-money/testing)
+
+npm remains the canonical install source. Use npmx for README, source,
+changelog, provenance, vulnerability, package-size, and registry health review.
+
 ## Signed webhook fixture
 
 ```ts
