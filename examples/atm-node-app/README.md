@@ -61,6 +61,12 @@ npm run smoke
 `typecheck` keeps the TypeScript helper code honest. `smoke` exercises the
 ATM webhook signature format without needing a live checkout or receiver URL.
 
+The sample server uses the correct claim → fulfill → complete/release state
+machine for both webhook and XRPC delivery, including exact claim-id fencing.
+Its `Map` is process-local demonstration state only. A production app must put
+the same transitions in durable shared storage, add an expiring lease, and keep
+its order/entitlement mutation idempotent.
+
 ## Sandbox walkthrough
 
 1. Register the app in the ATM dashboard test environment.
@@ -68,7 +74,8 @@ ATM webhook signature format without needing a live checkout or receiver URL.
 3. Add `http://localhost:8787/webhooks/atm` as the test webhook URL through a tunnel.
 4. Send a dashboard test event and confirm this server logs it once.
 5. Redrive the same event and confirm your idempotency layer treats it as already handled.
-6. Call `POST /checkout` and use the returned ATM checkout URL.
+6. Call `POST /checkout`. If the response includes `approvalUrl`, have the
+   creator approve the app in ATM, then retry and use the returned checkout URL.
 7. On return, call `GET /status?token=...`; fulfill only from the webhook/XRPC event.
 
 Webhook signatures use `Atm-Signature: t=<unix>,v1=<hex>` and

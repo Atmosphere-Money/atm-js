@@ -1,10 +1,12 @@
 import { createServer } from "node:http";
+import { randomUUID } from "node:crypto";
 import {
   ATM_BROKER_DID,
   ATM_EVENT_RECEIVE_NSID,
-  constructAtmWebhookEvent,
   constructAtmXrpcReceiverEvent,
   createAtmAppClient,
+  createNodeWebhookHandler,
+  type AtmWebhookDeliveryStore,
   type AtmVerifiedServiceAuthClaims,
 } from "@atmosphere-money/app-node";
 
@@ -30,6 +32,62 @@ const atm = createAtmAppClient({
   },
 });
 
+// Process-local demonstration only. Production apps must persist these exact
+// claim/complete/release transitions in shared storage and use an expiring
+// lease so another worker can recover a crashed claim.
+const demoDeliveryRows = new Map<
+  string,
+  | { status: "claimed"; claimId: string; claimedAt: number }
+  | { status: "completed" }
+>();
+const DEMO_DELIVERY_LEASE_MS = 30_000;
+const demoDeliveryStore: AtmWebhookDeliveryStore = {
+  claim(deliveryId) {
+    const current = demoDeliveryRows.get(deliveryId);
+    if (current?.status === "completed") return { status: "completed" };
+    if (
+      current?.status === "claimed" &&
+      Date.now() - current.claimedAt < DEMO_DELIVERY_LEASE_MS
+    ) {
+      return { status: "busy" };
+    }
+    const claimId = randomUUID();
+    demoDeliveryRows.set(deliveryId, {
+      status: "claimed",
+      claimId,
+      claimedAt: Date.now(),
+    });
+    return { status: "claimed", claimId };
+  },
+  complete(deliveryId, claimId) {
+    assertDemoClaimOwner(deliveryId, claimId);
+    demoDeliveryRows.set(deliveryId, { status: "completed" });
+  },
+  release(deliveryId, claimId) {
+    assertDemoClaimOwner(deliveryId, claimId);
+    demoDeliveryRows.delete(deliveryId);
+  },
+};
+
+function assertDemoClaimOwner(deliveryId: string, claimId: string) {
+  const current = demoDeliveryRows.get(deliveryId);
+  if (current?.status !== "claimed" || current.claimId !== claimId) {
+    throw new Error(`Stale ATM webhook delivery claim: ${deliveryId}`);
+  }
+}
+
+const atmWebhookHandler = createNodeWebhookHandler({
+  secret: env.webhookSecret,
+  deliveryStore: demoDeliveryStore,
+  onEvent: async (event) => {
+    // Replace this log with an idempotent order/subscription mutation. The
+    // helper completes the claim only after this callback returns 2xx, and
+    // releases it when this callback throws or returns non-2xx.
+    console.log("fulfilled verified ATM event", event.type, event.id);
+    return { status: 200, body: { ok: true, deliveryId: event.id } };
+  },
+});
+
 function json(status: number, body: unknown) {
   return new Response(JSON.stringify(body, null, 2), {
     status,
@@ -47,6 +105,21 @@ async function createCheckout() {
     return {
       blocked: true,
       reason: payout.reason ?? "Recipient cannot receive payments yet.",
+    };
+  }
+
+  const approval = await atm.requestRecipientApproval({
+    recipientDid: env.recipientDid,
+    environment: "test",
+    paymentTypes: ["tip"],
+    feeShareBps: 300,
+    requestReason: "Enable ATM Node starter checkout",
+  });
+  if (approval.status !== "approved") {
+    return {
+      blocked: true,
+      reason: "Creator app approval is required before checkout.",
+      approvalUrl: approval.dashboardUrl,
     };
   }
 
@@ -94,7 +167,7 @@ async function createTicketHold() {
     eventUri: "at://did:plc:organizer/community.lexicon.calendar.event/demo",
     buyerDid: "did:plc:buyer",
     buyerAssertionJwt: "<fresh-buyer-assertion>",
-    items: [{ ticketTierId: "tier_demo", quantity: 1 }],
+    items: [{ tierId: "tier_demo", quantity: 1 }],
     returnUrl: `${env.appBaseUrl}/tickets/return`,
     cancelUrl: `${env.appBaseUrl}/events/demo`,
     idempotencyKey: "hold:demo:did:plc:buyer:tier_demo:1",
@@ -113,7 +186,7 @@ async function claimFreeTicket() {
   return await atm.claimFreeTicket({
     environment: "test",
     eventUri: "at://did:plc:organizer/community.lexicon.calendar.event/demo",
-    ticketTierId: "tier_free_demo",
+    tierId: "tier_free_demo",
     buyerDid: "did:plc:buyer",
     buyerAssertionJwt: "<fresh-buyer-assertion>",
     idempotencyKey: "claim:demo:did:plc:buyer:tier_free_demo",
@@ -202,20 +275,7 @@ async function handle(request: Request) {
       return json(200, await checkInTicket());
     }
     if (request.method === "POST" && url.pathname === "/webhooks/atm") {
-      const rawBody = await readBody(request);
-      const event = constructAtmWebhookEvent({
-        rawBody,
-        secret: env.webhookSecret,
-        headers: {
-          signature: request.headers.get("atm-signature"),
-          deliveryId: request.headers.get("atm-delivery-id"),
-          event: request.headers.get("atm-event"),
-          apiVersion: request.headers.get("atm-api-version"),
-          environment: request.headers.get("atm-environment"),
-        },
-      });
-      console.log("verified ATM event", event.type, event.id);
-      return json(200, { ok: true, deliveryId: event.id });
+      return await atmWebhookHandler(request);
     }
     if (
       request.method === "POST" &&
@@ -236,8 +296,21 @@ async function handle(request: Request) {
         },
         verifyServiceAuthJwt: verifyLocalEventServiceAuth,
       });
-      console.log("received ATM XRPC event", event.type, event.id);
-      return json(200, { ok: true, deliveryId: event.id });
+      const claim = await demoDeliveryStore.claim(event.id, event);
+      if (claim.status === "completed") {
+        return json(200, { ok: true, duplicate: true, deliveryId: event.id });
+      }
+      if (claim.status === "busy") {
+        return json(503, { error: "AtmEventDeliveryBusy", deliveryId: event.id });
+      }
+      try {
+        console.log("fulfilled verified ATM XRPC event", event.type, event.id);
+        await demoDeliveryStore.complete(event.id, claim.claimId, event);
+        return json(200, { ok: true, deliveryId: event.id });
+      } catch (error) {
+        await demoDeliveryStore.release(event.id, claim.claimId, event, error);
+        throw error;
+      }
     }
     return json(404, { error: "NotFound" });
   } catch (error) {

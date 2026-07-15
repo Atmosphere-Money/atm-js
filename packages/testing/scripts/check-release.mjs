@@ -54,6 +54,7 @@ for (const exported of [
   "createTicketCheckedInFixture",
   "createTicketsIssuedFixture",
   "signAtmFixture",
+  "createMemoryDeliveryStore",
   "createMemoryReplayStore",
   "createAtmWebhookRequest",
   "assertFreshDelivery",

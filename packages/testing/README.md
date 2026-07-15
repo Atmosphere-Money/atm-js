@@ -7,6 +7,12 @@ sample payment/subscription/ticket events, generic event fixtures,
 replay-store helpers, and idempotency-key helpers so apps can test fulfillment
 without calling Stripe or ATM production services.
 
+Agents should use this package whenever they add an ATM webhook or XRPC
+receiver. The expected loop is: create a signed fixture, prove signature
+verification, atomically claim the delivery, fulfill from the verified ATM
+event, then complete the claim (or release it on failure). Start agent-oriented integrations at
+[`https://atmosphere.money/llms.txt`](https://atmosphere.money/llms.txt).
+
 ## Status
 
 `@atmosphere-money/testing` is the dev-only testing package for ATM app
@@ -44,7 +50,7 @@ const event = constructTypedAtmWebhookEvent({
   rawBody: fixture.rawBody,
   secret: ATM_TEST_WEBHOOK_SECRET,
   expectedType: "payment.completed",
-  now: fixture.event.created,
+  now: fixture.signatureTimestamp,
   headers: {
     signature: fixture.headers["atm-signature"],
     deliveryId: fixture.headers["atm-delivery-id"],
@@ -64,16 +70,19 @@ Use `createAtmWebhookRequest` when your route tests expect a real Web
 import {
   ATM_TEST_WEBHOOK_SECRET,
   createAtmWebhookRequest,
+  createMemoryDeliveryStore,
   createPaymentCompletedFixture,
 } from "@atmosphere-money/testing";
 import { createNodeWebhookHandler } from "@atmosphere-money/app-node";
 
 const fixture = createPaymentCompletedFixture();
 const request = createAtmWebhookRequest(fixture);
+const deliveryStore = createMemoryDeliveryStore();
 
 const handler = createNodeWebhookHandler({
   secret: ATM_TEST_WEBHOOK_SECRET,
   expectedType: "payment.completed",
+  deliveryStore,
   onEvent: async (event) => {
     const metadata = event.data.payment.metadata as
       | { appOrderId?: string }
@@ -85,17 +94,34 @@ const handler = createNodeWebhookHandler({
 const response = await handler(request);
 ```
 
-## Replay helper
+`createMemoryDeliveryStore` is process-local and intended only for tests. In
+production, use a durable shared database/KV row with an expiring lease and
+condition `complete`/`release` on the exact claim id.
+
+## Delivery lifecycle helper
 
 ```ts
 import {
-  assertFreshDelivery,
-  createMemoryReplayStore,
+  createMemoryDeliveryStore,
 } from "@atmosphere-money/testing";
 
-const replayStore = createMemoryReplayStore();
-await assertFreshDelivery(replayStore, "del_payment_completed_fixture");
+const store = createMemoryDeliveryStore();
+const claim = store.claim("del_payment_completed_fixture");
+if (claim.status !== "claimed") throw new Error("delivery was not claimable");
+
+try {
+  await fulfillPaidOrder({ deliveryId: "del_payment_completed_fixture" });
+  store.complete("del_payment_completed_fixture", claim.claimId);
+} catch (error) {
+  store.release("del_payment_completed_fixture", claim.claimId);
+  throw error;
+}
 ```
+
+The older `createMemoryReplayStore` / `assertFreshDelivery` exports remain only
+as deprecated compatibility helpers for low-level replay tests. Do not use an
+insert-before-fulfillment replay key as a fulfillment gate: a failed attempt
+cannot release it for ATM redrive.
 
 ## Generic event fixture
 
@@ -108,8 +134,10 @@ import { createAtmEventFixture } from "@atmosphere-money/testing";
 const archived = createAtmEventFixture({
   type: "product.archived",
   data: {
-    productUri: "at://did:plc:creator/money.atmosphere.product/product_123",
-    appDid: "did:plc:app",
+    product: {
+      uri: "at://did:plc:creator/money.atmosphere.product/product_123",
+    },
+    creatorDid: "did:plc:creator",
   },
 });
 ```
@@ -129,13 +157,14 @@ import {
 } from "@atmosphere-money/testing";
 
 const failedPayment = createPaymentFailedFixture({
-  payment: { failureCode: "card_declined" },
+  reason: "card_declined",
 });
 const refundedPayment = createPaymentRefundedFixture({
-  payment: { refundedAmountCents: 500 },
+  amount: 500,
+  amountRefundedTotal: 500,
 });
 const disputedPayment = createPaymentDisputedFixture({
-  payment: { disputeStatus: "under_review" },
+  status: "under_review",
 });
 const archivedProduct = createProductArchivedFixture();
 const checkedInTicket = createTicketCheckedInFixture();
@@ -154,8 +183,7 @@ const checkedInTicket = createTicketCheckedInFixture();
 - `createTicketsIssuedFixture`
 - `signAtmFixture`
 - `createAtmWebhookRequest`
-- `createMemoryReplayStore`
-- `assertFreshDelivery`
+- `createMemoryDeliveryStore`
 - `createAtmIdempotencyKey`
 
 ## License
