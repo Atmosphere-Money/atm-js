@@ -73,6 +73,7 @@ await writeFile(
 import {
   ATM_TEST_WEBHOOK_SECRET,
   createAtmWebhookRequest,
+  createMemoryDeliveryStore,
   createPaymentCompletedFixture,
 } from "@atmosphere-money/testing";
 
@@ -92,7 +93,8 @@ const request = createAtmWebhookRequest(fixture);
 const hono = createHonoWebhookHandler({
   secret: ATM_TEST_WEBHOOK_SECRET,
   expectedType: "payment.completed",
-  now: fixture.event.created,
+  now: fixture.signatureTimestamp,
+  deliveryStore: createMemoryDeliveryStore(),
   onEvent: (event) => ({ body: { paymentId: event.data.payment.id } }),
 });
 const honoResponse = await hono({ req: { raw: request } });
@@ -101,7 +103,8 @@ if (honoResponse.status !== 200) throw new Error("Hono helper failed");
 const worker = createCloudflareWorkerWebhookHandler({
   secret: ATM_TEST_WEBHOOK_SECRET,
   expectedType: "payment.completed",
-  now: fixture.event.created,
+  now: fixture.signatureTimestamp,
+  deliveryStore: createMemoryDeliveryStore(),
   onEvent: () => ({ body: { ok: true } }),
 });
 const workerResponse = await worker.fetch(createAtmWebhookRequest(fixture));
@@ -125,10 +128,10 @@ if (claims.jti !== "jti_fixture") throw new Error("service-auth helper failed");
 
 createTicketHoldBody({
   eventUri: "at://did:plc:organizer/community.lexicon.calendar.event/demo",
-  items: [{ ticketTierId: "tier_demo", quantity: 1 }],
+  items: [{ tierId: "tier_demo", quantity: 1 }],
 });
 createFreeTicketClaimBody({
-  ticketTierId: "tier_free",
+  tierId: "tier_free",
   buyerDid: "did:plc:buyer",
   buyerAssertionJwt: "buyer.assertion.jwt",
 });

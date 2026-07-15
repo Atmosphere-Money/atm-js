@@ -60,7 +60,9 @@ const event = constructTypedAtmWebhookEvent({
   rawBody: fixture.rawBody,
   secret: ATM_TEST_WEBHOOK_SECRET,
   expectedType: "payment.completed",
-  now: fixture.event.created,
+  // Bridge the currently published pre-beta.3 fixture and the 2026-07 fixture
+  // contract. Remove the fallback after testing beta.3 is published.
+  now: fixture.signatureTimestamp ?? fixture.event.created,
   headers: {
     signature: request.headers.get("atm-signature"),
     deliveryId: request.headers.get("atm-delivery-id"),

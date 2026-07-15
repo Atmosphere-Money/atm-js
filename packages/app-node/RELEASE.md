@@ -7,7 +7,8 @@ checklist before publishing a new beta.
 
 1. npm organization `@atmosphere-money` is claimed.
 2. Require 2FA for publishing and org membership.
-3. Add trusted publishers for the GitHub release workflows.
+3. Add trusted publishers for the public `Atmosphere-Money/atm-js` GitHub
+   release workflows.
 4. Keep package names under the org short and runtime-specific:
    - `@atmosphere-money/app-node`
    - `@atmosphere-money/testing`
@@ -57,6 +58,7 @@ cd ../..
 npm run sdk:check
 npm run sdk:pack:check
 npm run starters:check
+npm run sdk:public-install:check
 ```
 
 4. Run `npm pack --dry-run` and inspect the file list.

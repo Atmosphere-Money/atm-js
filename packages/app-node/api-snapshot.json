@@ -1,6 +1,6 @@
 {
   "packageName": "@atmosphere-money/app-node",
-  "version": "0.0.0-beta.2",
+  "version": "0.0.0-beta.4",
   "generatedFrom": "packages/app-node/src/index.ts",
   "exports": [
     {
@@ -33,11 +33,39 @@
     },
     {
       "kind": "type",
+      "name": "AtmAppConfig"
+    },
+    {
+      "kind": "type",
+      "name": "AtmAppWebhookEventSetting"
+    },
+    {
+      "kind": "type",
       "name": "AtmArchiveTicketTierInput"
     },
     {
       "kind": "type",
       "name": "AtmArchiveTicketTierResult"
+    },
+    {
+      "kind": "type",
+      "name": "AtmAttestation"
+    },
+    {
+      "kind": "type",
+      "name": "AtmAttestationProofRef"
+    },
+    {
+      "kind": "type",
+      "name": "AtmAttestationRefInspection"
+    },
+    {
+      "kind": "type",
+      "name": "AtmAttestationTier"
+    },
+    {
+      "kind": "type",
+      "name": "AtmAuditFeeDistributionsParams"
     },
     {
       "kind": "type",
@@ -53,11 +81,27 @@
     },
     {
       "kind": "type",
+      "name": "AtmCheckoutPublicRecords"
+    },
+    {
+      "kind": "type",
+      "name": "AtmCheckoutSubscriptionPolicy"
+    },
+    {
+      "kind": "type",
       "name": "AtmCloudflareWorkerWebhookHandler"
     },
     {
       "kind": "type",
       "name": "AtmCreateCapacityGroupInput"
+    },
+    {
+      "kind": "type",
+      "name": "AtmCreateProductInput"
+    },
+    {
+      "kind": "type",
+      "name": "AtmCreateTicketEventInput"
     },
     {
       "kind": "type",
@@ -89,6 +133,18 @@
     },
     {
       "kind": "type",
+      "name": "AtmFeeDistribution"
+    },
+    {
+      "kind": "type",
+      "name": "AtmFeeDistributionsResult"
+    },
+    {
+      "kind": "type",
+      "name": "AtmFeeDistributionStatus"
+    },
+    {
+      "kind": "type",
       "name": "AtmFreeTicketClaimInput"
     },
     {
@@ -105,6 +161,10 @@
     },
     {
       "kind": "type",
+      "name": "AtmLexiconTypedEventData"
+    },
+    {
+      "kind": "type",
       "name": "AtmListBuyerTicketsParams"
     },
     {
@@ -114,6 +174,10 @@
     {
       "kind": "type",
       "name": "AtmListTicketsResult"
+    },
+    {
+      "kind": "type",
+      "name": "AtmPayerClaimedEventData"
     },
     {
       "kind": "type",
@@ -141,7 +205,55 @@
     },
     {
       "kind": "type",
+      "name": "AtmPledgeConversionFailedEventData"
+    },
+    {
+      "kind": "type",
+      "name": "AtmPledgeConvertedEventData"
+    },
+    {
+      "kind": "type",
+      "name": "AtmPledgeEventData"
+    },
+    {
+      "kind": "type",
+      "name": "AtmPledgeSummary"
+    },
+    {
+      "kind": "type",
+      "name": "AtmProductAppRef"
+    },
+    {
+      "kind": "type",
+      "name": "AtmProductCustomUnitAmount"
+    },
+    {
+      "kind": "type",
       "name": "AtmProductEventData"
+    },
+    {
+      "kind": "type",
+      "name": "AtmProductInventoryInput"
+    },
+    {
+      "kind": "type",
+      "name": "AtmProductKind"
+    },
+    {
+      "kind": "type",
+      "name": "AtmProductPriceInput"
+    },
+    {
+      "kind": "type",
+      "name": "AtmProductPriceTier"
+    },
+    {
+      "kind": "type",
+      "name": "AtmProductRecurringPrice"
+    },
+    {
+      "kind": "type",
+      "name": "AtmProductWriteResult"
     },
     {
       "kind": "type",
@@ -149,7 +261,27 @@
     },
     {
       "kind": "type",
+      "name": "AtmPublicRecordPaymentPolicy"
+    },
+    {
+      "kind": "type",
+      "name": "AtmPublicRecordsPolicy"
+    },
+    {
+      "kind": "type",
+      "name": "AtmPublicRecordVisibility"
+    },
+    {
+      "kind": "type",
       "name": "AtmReceiverServiceAuthVerifier"
+    },
+    {
+      "kind": "type",
+      "name": "AtmRecipientApprovalStatus"
+    },
+    {
+      "kind": "type",
+      "name": "AtmRecipientAuthorizationEventData"
     },
     {
       "kind": "type",
@@ -161,11 +293,27 @@
     },
     {
       "kind": "type",
+      "name": "AtmRequestRecipientApprovalInput"
+    },
+    {
+      "kind": "type",
+      "name": "AtmRequestRecipientApprovalResult"
+    },
+    {
+      "kind": "type",
+      "name": "AtmSegmentMessageEventData"
+    },
+    {
+      "kind": "type",
       "name": "AtmServiceAuthTokenProvider"
     },
     {
       "kind": "type",
       "name": "AtmStrongRef"
+    },
+    {
+      "kind": "type",
+      "name": "AtmSubscriptionActiveLimit"
     },
     {
       "kind": "type",
@@ -205,6 +353,14 @@
     },
     {
       "kind": "type",
+      "name": "AtmTicketEventResult"
+    },
+    {
+      "kind": "type",
+      "name": "AtmTicketEventStatus"
+    },
+    {
+      "kind": "type",
       "name": "AtmTicketEventSummary"
     },
     {
@@ -233,6 +389,10 @@
     },
     {
       "kind": "type",
+      "name": "AtmTicketWaitlistEventData"
+    },
+    {
+      "kind": "type",
       "name": "AtmTypedEvent"
     },
     {
@@ -241,7 +401,19 @@
     },
     {
       "kind": "type",
+      "name": "AtmUpdateAppConfigInput"
+    },
+    {
+      "kind": "type",
       "name": "AtmUpdateCapacityGroupInput"
+    },
+    {
+      "kind": "type",
+      "name": "AtmUpdateProductInput"
+    },
+    {
+      "kind": "type",
+      "name": "AtmUpdateTicketEventInput"
     },
     {
       "kind": "type",
@@ -258,6 +430,14 @@
     {
       "kind": "type",
       "name": "AtmVerifyTicketResult"
+    },
+    {
+      "kind": "type",
+      "name": "AtmWebhookDeliveryClaimResult"
+    },
+    {
+      "kind": "type",
+      "name": "AtmWebhookDeliveryStore"
     },
     {
       "kind": "type",
@@ -385,6 +565,10 @@
     },
     {
       "kind": "function",
+      "name": "inspectAtmAttestationRefs"
+    },
+    {
+      "kind": "function",
       "name": "signAtmWebhookPayload"
     },
     {
@@ -410,11 +594,15 @@
   ],
   "clientMethods": [
     "archiveTicketTier",
+    "auditFeeDistributions",
     "checkInTicket",
     "claimFreeTicket",
     "createCapacityGroup",
+    "createProduct",
+    "createTicketEvent",
     "createTicketHold",
     "createTicketTier",
+    "getAppConfig",
     "getPaymentStatus",
     "getPayoutStatus",
     "getProfile",
@@ -423,7 +611,11 @@
     "listBuyerTickets",
     "listOrganizerTickets",
     "releaseTicketHold",
+    "requestRecipientApproval",
+    "updateAppConfig",
     "updateCapacityGroup",
+    "updateProduct",
+    "updateTicketEvent",
     "updateTicketTier",
     "verifyTicket"
   ]

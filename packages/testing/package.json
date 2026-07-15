@@ -1,6 +1,6 @@
 {
   "name": "@atmosphere-money/testing",
-  "version": "0.0.0-beta.2",
+  "version": "0.0.0-beta.3",
   "description": "Testing fixtures and assertions for Atmosphere Money app integrations.",
   "license": "MIT",
   "type": "module",

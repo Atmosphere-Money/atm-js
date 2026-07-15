@@ -10,9 +10,9 @@ const rawBody = JSON.stringify({
   id: deliveryId,
   environment: "test",
   type: "payment.completed",
-  created: timestamp,
-  apiVersion: "2026-05",
-  data: { payment: { id: "pmt_test", amountCents: 500, currency: "usd" } },
+  createdAt: new Date(timestamp * 1000).toISOString(),
+  apiVersion: "2026-07",
+  data: { payment: { id: "pmt_test", amount: 500, currency: "usd" } },
 });
 
 const signature = signAtmWebhookPayload({
